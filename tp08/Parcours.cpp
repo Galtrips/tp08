@@ -3,7 +3,7 @@
 #include <sstream>
 #define _USE_MATH_DEFINES
 #include <math.h>
-
+#include <stdlib.h>  
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -35,8 +35,10 @@ void Parcours::loadParcours(const char* link) {
 	auto nodes = doc.select_nodes("/osm/node");
 	for (auto n : nodes) {
 		coord geo;
-		geo.Lat = n.node().attribute("lat").as_double();
-		geo.Lon = n.node().attribute("lon").as_double();
+		double Lat, Long, Cote;
+		latLon2xy(n.node().attribute("lat").as_double(), n.node().attribute("lon").as_double(), Lat, Long, Cote);
+		geo.Lat = Lat;
+		geo.Lon = Long;
 		auto id = n.node().attribute("id").as_string();
 		map.insert(pair <string, coord>(id, geo));
 	}
@@ -75,12 +77,28 @@ void Parcours::readWay(pugi::xml_document& doc, string tag) {
 				for (auto n : nd) {
 					
 					string ref = n.node().attribute("ref").as_string();
-					double Lat = map.find(ref)->second.Lat;
-					double Lon = map.find(ref)->second.Lon;
+					
+					double Lat;
+					double Lon;
+					double Cote;
+					latLon2xy(map.find(ref)->second.Lat, map.find(ref)->second.Lon, Lat, Lon, Cote);
+
 					object.back()->addCoord(Lat, Lon);
 				}
 			}
 		}
+	}
+}
+
+void Parcours::addlimite(pugi::xml_document& doc) {
+	auto nodes = doc.select_nodes("/osm/bounds");
+	
+	for (auto n : nodes) {
+		double y1 = labs(n.node().attribute("minlat").as_double() - n.node().attribute("maxlat").as_double());
+		double x1 = labs(n.node().attribute("minlon").as_double() - n.node().attribute("maxlon").as_double());
+		
+		double Cote;
+		latLon2xy(y1, x1, y, x, Cote);
 	}
 }
 

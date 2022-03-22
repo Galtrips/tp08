@@ -2,6 +2,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include<SDL.h>
+#include <SDL_ttf.h>
+#include "config_sdl.h"
 
 using namespace std;
 
