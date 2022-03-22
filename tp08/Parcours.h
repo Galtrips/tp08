@@ -16,12 +16,15 @@ class Parcours
 private:
 	string nom;
 	map <string, coord> map;
+	vector <Element*> object;
 	void latLon2xy(double lat, double lon, double &x, double &y, double &z);
 	
 public:
 	Parcours(string n) : nom(n) { ; }
-	~Parcours() { ; };
+	~Parcours();
 
 	void loadParcours(const char* link);
+	void addElement(Element& e);
+	void readWay(pugi::xml_document& doc, string tag);
 };
 
