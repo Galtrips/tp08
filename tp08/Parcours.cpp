@@ -31,7 +31,7 @@ void Parcours::loadParcours(const char* link) {
 	
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file(link);
-
+	addlimite(doc);
 	auto nodes = doc.select_nodes("/osm/node");
 	for (auto n : nodes) {
 		coord geo;
@@ -53,7 +53,6 @@ void Parcours::loadParcours(const char* link) {
 		readWay(doc, i);
 	}
 
-	cout << object.size();
 }
 
 void Parcours::addElement(Element& e) {
@@ -82,7 +81,13 @@ void Parcours::readWay(pugi::xml_document& doc, string tag) {
 					double Lon;
 					double Cote;
 					latLon2xy(map.find(ref)->second.Lat, map.find(ref)->second.Lon, Lat, Lon, Cote);
+					
+					auto n2 = doc.select_nodes("/osm/bounds");
+					for (auto n : n2) {
+						double Lat =- n.node().attribute("minlat").as_double();
+						double Lon =- n.node().attribute("minlon").as_double();
 
+					}
 					object.back()->addCoord(Lat, Lon);
 				}
 			}
@@ -94,11 +99,12 @@ void Parcours::addlimite(pugi::xml_document& doc) {
 	auto nodes = doc.select_nodes("/osm/bounds");
 	
 	for (auto n : nodes) {
-		double y1 = labs(n.node().attribute("minlat").as_double() - n.node().attribute("maxlat").as_double());
-		double x1 = labs(n.node().attribute("minlon").as_double() - n.node().attribute("maxlon").as_double());
+		double y1 = n.node().attribute("maxlat").as_double() - n.node().attribute("minlat").as_double();
+		double x1 = n.node().attribute("maxlon").as_double() - n.node().attribute("minlon").as_double();
 		
 		double Cote;
 		latLon2xy(y1, x1, y, x, Cote);
+	
 	}
 }
 
