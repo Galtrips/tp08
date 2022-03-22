@@ -28,5 +28,7 @@ public:
 	void addElement(Element& e);
 	void readWay(pugi::xml_document& doc, string tag);
 	void addlimite(pugi::xml_document& doc);
+	double getX() { return x; }
+	double getY() { return y; }
 };
 
